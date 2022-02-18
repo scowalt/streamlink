@@ -156,6 +156,8 @@ jobs:
     needs:
       - deploy-documentation
     runs-on: ubuntu-20.04
+    outputs:
+      exeSha: ${{ steps.generateSha.exeSha }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -186,6 +188,9 @@ jobs:
         env:
           RELEASE_KEY_PASSPHRASE: ${{ secrets.RELEASE_KEY_PASSPHRASE }}
         run: ./script/build-and-sign.sh
+      - name: Generate sha256
+        id: generateSha
+        run: echo "::set-output name=exeSha::$(sha256sum "${STREAMLINK_DIST_DIR}/streamlink-*.exe" | awk '{ print $1}')"
       - name: Github release
         env:
           RELEASES_API_KEY: ${{ secrets.RELEASES_API_KEY }}
@@ -195,3 +200,11 @@ jobs:
           PYPI_USER: streamlink
           PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: ./script/deploy-pypi.sh
+  chocolatey:
+    name: Chocolatey release
+    needs:
+      - release
+    runs-on: windows-latest
+    with:
+      exeSha: ${{ needs.release.outputs.exeSha }}
+    steps:
