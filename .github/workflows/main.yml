@@ -211,13 +211,15 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 300
-      - run: |
-          (Get-Content -Path "./release/chocolatey/streamlink.nuspec") -replace '<!-- version number -->', '${GITHUB_REF##*/}' | Set-Content "./release/chocolatey/streamlink.nuspec"
-          (Get-Content -Path "./release/chocolatey/tools/chocolateyinstall.ps1") -replace "checksum      = '' # checksum", "checksum      = '${{  needs.release.outputs.exeSha  }}'" | Set-Content "./release/chocolatey/tools/chocolateyinstall.ps1"
+      - name: Prepare nuspec and script files
+        working-directory: release/chocolatey
+        run: |
+          (Get-Content -Path "./streamlink.nuspec") -replace '<!-- version number -->', '${GITHUB_REF##*/}' | Set-Content "./streamlink.nuspec"
+          (Get-Content -Path "./tools/chocolateyinstall.ps1") -replace "checksum      = '' # checksum", "checksum      = '${{  needs.release.outputs.exeSha  }}'" | Set-Content "./tools/chocolateyinstall.ps1"
         shell: pwsh
-        name: Prepare nuspec and script files
+
       - name: Choco pack
         working-directory: release/chocolatey
-        uses: crazy-max/ghaction-chocolatey@v1
-        with:
-          args: pack
+        run: |
+          choco pack
+        shell: pwsh
