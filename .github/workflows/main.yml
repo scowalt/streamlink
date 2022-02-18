@@ -193,15 +193,15 @@ jobs:
       - name: Generate sha256
         id: generateSha
         run: echo "::set-output name=exeSha::$(sha256sum "${STREAMLINK_DIST_DIR}/streamlink-*.exe" | awk '{ print $1}')"
-      - name: Github release
-        env:
-          RELEASES_API_KEY: ${{ secrets.RELEASES_API_KEY }}
-        run: ./script/github_releases.py "${STREAMLINK_DIST_DIR}/"*{.exe,.tar.gz{,.asc}}
-      - name: PyPI release
-        env:
-          PYPI_USER: streamlink
-          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: ./script/deploy-pypi.sh
+      # - name: Github release
+      #   env:
+      #     RELEASES_API_KEY: ${{ secrets.RELEASES_API_KEY }}
+      #   run: ./script/github_releases.py "${STREAMLINK_DIST_DIR}/"*{.exe,.tar.gz{,.asc}}
+      # - name: PyPI release
+      #   env:
+      #     PYPI_USER: streamlink
+      #     PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      #   run: ./script/deploy-pypi.sh
   chocolatey:
     name: Chocolatey release
     needs:
