@@ -122,39 +122,41 @@ jobs:
           name: ${{ steps.installer.outputs.filename }}-win32
           path: ${{ env.STREAMLINK_DIST_DIR }}/${{ steps.installer.outputs.filename }}.exe
 
-  deploy-documentation:
-    name: Deploy docs
-    if: github.repository == 'scowalt/streamlink' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
-    needs:
-      - test
-      - documentation
-      - windows-installer
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 300
-      - name: Fetch tags
-        run: git fetch --depth=300 origin +refs/tags/*:refs/tags/*
-      - uses: actions/setup-python@v1
-        with:
-          python-version: 3.9
-      - name: Install dependencies
-        run: |
-          ./script/install-dependencies.sh
-          python -m pip install -r docs-requirements.txt
-      - name: Build
-        run: make --directory=docs html
-      - name: Deploy
-        env:
-          DOCS_KEY_PASSPHRASE: ${{ secrets.DOCS_KEY_PASSPHRASE }}
-        run: ./script/deploy-docs.sh
+  # deploy-documentation:
+  #   name: Deploy docs
+  #   if: github.repository == 'scowalt/streamlink' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
+  #   needs:
+  #     - test
+  #     - documentation
+  #     - windows-installer
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 300
+  #     - name: Fetch tags
+  #       run: git fetch --depth=300 origin +refs/tags/*:refs/tags/*
+  #     - uses: actions/setup-python@v1
+  #       with:
+  #         python-version: 3.9
+  #     - name: Install dependencies
+  #       run: |
+  #         ./script/install-dependencies.sh
+  #         python -m pip install -r docs-requirements.txt
+  #     - name: Build
+  #       run: make --directory=docs html
+  #     - name: Deploy
+  #       env:
+  #         DOCS_KEY_PASSPHRASE: ${{ secrets.DOCS_KEY_PASSPHRASE }}
+  #       run: ./script/deploy-docs.sh
 
   release:
     name: New release
     if: github.repository == 'scowalt/streamlink' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs:
-      - deploy-documentation
+      - test
+      - documentation
+      - windows-installer
     runs-on: ubuntu-20.04
     outputs:
       exeSha: ${{ steps.generateSha.exeSha }}
