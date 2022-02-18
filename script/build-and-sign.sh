@@ -34,26 +34,26 @@ for platform in "${wheel_platforms_windows[@]}"; do
 done
 
 
-if [[ "${CI}" = true ]] || [[ -n "${GITHUB_ACTIONS}" ]]; then
-    echo "build: Decrypting signing key" >&2
-    gpg --quiet --batch --yes --decrypt \
-        --passphrase="${RELEASE_KEY_PASSPHRASE}" \
-        --output "${KEY_FILE}" \
-        "${KEY_FILE_ENC}"
-fi
+# if [[ "${CI}" = true ]] || [[ -n "${GITHUB_ACTIONS}" ]]; then
+#     echo "build: Decrypting signing key" >&2
+#     gpg --quiet --batch --yes --decrypt \
+#         --passphrase="${RELEASE_KEY_PASSPHRASE}" \
+#         --output "${KEY_FILE}" \
+#         "${KEY_FILE_ENC}"
+# fi
 
-if ! [[ -f "${KEY_FILE}" ]]; then
+# if ! [[ -f "${KEY_FILE}" ]]; then
     echo "warning: No signing key, files not signed" >&2
-else
-    echo "build: Signing sdist and wheel files" >&2
-    temp_keyring=$(mktemp -d) && trap "rm -rf ${temp_keyring}" EXIT || exit 255
-    gpg --homedir "${temp_keyring}" --import "${KEY_FILE}" 2>&1 >/dev/null
-    for file in "${dist_dir}"/streamlink-"${version}"{.tar.gz,-*.whl}; do
-        gpg --homedir "${temp_keyring}" \
-            --trust-model always \
-            --default-key "${KEY_ID}" \
-            --detach-sign \
-            --armor \
-            "${file}"
-    done
-fi
+# else
+#     echo "build: Signing sdist and wheel files" >&2
+#     temp_keyring=$(mktemp -d) && trap "rm -rf ${temp_keyring}" EXIT || exit 255
+#     gpg --homedir "${temp_keyring}" --import "${KEY_FILE}" 2>&1 >/dev/null
+#     for file in "${dist_dir}"/streamlink-"${version}"{.tar.gz,-*.whl}; do
+#         gpg --homedir "${temp_keyring}" \
+#             --trust-model always \
+#             --default-key "${KEY_ID}" \
+#             --detach-sign \
+#             --armor \
+#             "${file}"
+#     done
+# fi
