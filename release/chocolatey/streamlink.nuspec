@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>streamlink</id>
-    <version><!-- replaced --></version>
+    <version><!-- version number --></version>
     <packageSourceUrl>https://github.com/streamlink/streamlink-chocolatey</packageSourceUrl>
     <owners>Scott Walters</owners>
     <iconUrl>https://cdn.rawgit.com/streamlink/streamlink/master/icon.svg</iconUrl>
@@ -25,7 +25,7 @@ Copyright (c) 2016-2022, Streamlink Team</copyright>
 The main purpose of Streamlink is to avoid resource-heavy and unoptimized websites, while still allowing the user to enjoy various streamed content.
 
 Streamlink was forked from [Livestreamer](https://github.com/chrippa/livestreamer), which is no longer maintained.</description>
-    <releaseNotes>https://github.com/streamlink/streamlink/releases/tag/<!-- replaced --></releaseNotes>
+    <releaseNotes>https://github.com/streamlink/streamlink/releases/tag/<!-- version number --></releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />

@@ -1,4 +1,4 @@
-﻿
+
 $ErrorActionPreference = 'Stop';
 
 $packageName= 'Streamlink'
@@ -17,7 +17,7 @@ $packageArgs = @{
 
   softwareName  = 'Streamlink*'
 
-  checksum      = '' # replaced
+  checksum      = '' # checksum
   checksumType  = 'sha256'
 
   silentArgs   = '/S'
