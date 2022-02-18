@@ -192,7 +192,7 @@ jobs:
         run: ./script/build-and-sign.sh
       - name: Generate sha256
         id: generateSha
-        run: echo "::set-output name=exeSha::$(sha256sum "${STREAMLINK_DIST_DIR}/streamlink-*.exe" | awk '{ print $1}')"
+        run: echo "::set-output name=exeSha::$(sha256sum "${STREAMLINK_DIST_DIR}/${{ steps.installer.outputs.filename }}.exe" | awk '{ print $1}')"
       # - name: Github release
       #   env:
       #     RELEASES_API_KEY: ${{ secrets.RELEASES_API_KEY }}
@@ -217,6 +217,7 @@ jobs:
         shell: pwsh
         name: Prepare nuspec and script files
       - name: Choco pack
+        working-directory: release/chocolatey
         uses: crazy-max/ghaction-chocolatey@v1
         with:
           args: pack
