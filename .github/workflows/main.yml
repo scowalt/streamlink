@@ -216,7 +216,7 @@ jobs:
         run: |
           echo ${{  needs.release.outputs.exeSha  }}
           $version = $(python setup.py --version | sed 's/+/_/')
-          (Get-Content -Path "./streamlink.nuspec") -replace "<!-- version number -->"", "$version" | Set-Content "./streamlink.nuspec"
+          (Get-Content -Path "./streamlink.nuspec") -replace "<!-- version number -->", "$version" | Set-Content "./streamlink.nuspec"
           (Get-Content -Path "./tools/chocolateyinstall.ps1") -replace "checksum      = '' # checksum", "checksum      = '${{  needs.release.outputs.exeSha  }}'" | Set-Content "./tools/chocolateyinstall.ps1"
         shell: pwsh
 
