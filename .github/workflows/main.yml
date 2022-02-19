@@ -213,7 +213,6 @@ jobs:
           fetch-depth: 300
       - name: Prepare nuspec and script files
         run: |
-          echo ${{  needs.release.outputs.exeSha  }}
           $version = $(python setup.py --version | sed 's/+/_/')
           (Get-Content -Path "./release/chocolatey/streamlink.nuspec") -replace "<!-- version number -->", "$version" | Set-Content "./release/chocolatey/streamlink.nuspec"
           (Get-Content -Path "./release/chocolatey/tools/chocolateyinstall.ps1") -replace "checksum      = '' # checksum", "checksum      = '${{  needs.release.outputs.exeSha  }}'" | Set-Content "./release/chocolatey/tools/chocolateyinstall.ps1"
