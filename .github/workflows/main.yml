@@ -150,12 +150,24 @@ jobs:
   #         DOCS_KEY_PASSPHRASE: ${{ secrets.DOCS_KEY_PASSPHRASE }}
   #       run: ./script/deploy-docs.sh
 
+  version:
+    name: Generate version number
+    runs-on: ubuntu-20.04
+    outputs:
+      version: ${{ steps.getVerion.outputs.version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Generate verison number
+        id: version
+        run: echo ::set-output name=version::$(python setup.py --version | sed 's/+/_/')
+
   release:
     name: New release
     if: github.repository == 'scowalt/streamlink' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-20.04
     needs:
       - windows-installer
+      - version
     outputs:
       exeSha: ${{ steps.generateSha.outputs.exeSha }}
     steps:
@@ -178,7 +190,7 @@ jobs:
         run: make --directory=docs man
       - name: Installer file name
         id: installer
-        run: echo ::set-output name=filename::streamlink-$(python setup.py --version | sed 's/+/_/')
+        run: echo ::set-output name=filename::streamlink-${{ needs.version.outputs.version }}
       - name: Download installer artifact
         uses: actions/download-artifact@v2-preview
         with:
@@ -206,6 +218,7 @@ jobs:
     name: Chocolatey release
     needs:
       - release
+      - version
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -213,13 +226,16 @@ jobs:
           fetch-depth: 300
       - name: Prepare nuspec and script files
         run: |
-          $version = $(python setup.py --version | sed 's/+/_/')
+          $version = ${{ needs.version.outputs.version }}
           (Get-Content -Path "./release/chocolatey/streamlink.nuspec") -replace "<!-- version number -->", "$version" | Set-Content "./release/chocolatey/streamlink.nuspec"
           (Get-Content -Path "./release/chocolatey/tools/chocolateyinstall.ps1") -replace "checksum      = '' # checksum", "checksum      = '${{  needs.release.outputs.exeSha  }}'" | Set-Content "./release/chocolatey/tools/chocolateyinstall.ps1"
         shell: pwsh
 
-      - name: Choco pack
+      - name: Package release
         working-directory: release/chocolatey
         run: |
           choco pack
         shell: pwsh
+      - name: Publish release
+        run: |
+          choco push --api-key ${{ secrets.CHOCOLATEY_API_KEY }} streamlink.$version.nupkg
