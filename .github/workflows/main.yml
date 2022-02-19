@@ -92,9 +92,22 @@ jobs:
   #     - name: Build
   #       run: make --directory=docs html man
 
+  version:
+    name: Generate version number
+    runs-on: ubuntu-20.04
+    outputs:
+      version: ${{ steps.getVersion.outputs.version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Generate verison number
+        id: getVersion
+        run: echo ::set-output name=version::$(python setup.py --version | sed 's/+/_/')
+
   windows-installer:
     name: Windows installer
     runs-on: ubuntu-20.04
+    needs:
+      - version
     steps:
       - uses: actions/checkout@v2
         with:
@@ -112,7 +125,7 @@ jobs:
           sudo apt install -y nsis imagemagick inkscape
       - name: Installer file name
         id: installer
-        run: echo ::set-output name=filename::streamlink-$(python setup.py --version | sed 's/+/_/')
+        run: echo ::set-output name=filename::streamlink-${{ needs.version.outputs.version }}
       - name: Build
         run: ./script/makeinstaller.sh "${{ steps.installer.outputs.filename }}"
       - name: Upload artifact
@@ -149,17 +162,6 @@ jobs:
   #       env:
   #         DOCS_KEY_PASSPHRASE: ${{ secrets.DOCS_KEY_PASSPHRASE }}
   #       run: ./script/deploy-docs.sh
-
-  version:
-    name: Generate version number
-    runs-on: ubuntu-20.04
-    outputs:
-      version: ${{ steps.getVersion.outputs.version }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Generate verison number
-        id: getVersion
-        run: echo ::set-output name=version::$(python setup.py --version | sed 's/+/_/')
 
   release:
     name: New release
