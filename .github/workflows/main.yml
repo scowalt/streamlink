@@ -157,7 +157,7 @@ jobs:
     needs:
       - windows-installer
     outputs:
-      exeSha: ${{ steps.generateSha.exeSha }}
+      exeSha: ${{ steps.generateSha.outputs.exeSha }}
     steps:
       - uses: actions/checkout@v2
         with:
