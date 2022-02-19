@@ -92,35 +92,35 @@ jobs:
   #     - name: Build
   #       run: make --directory=docs html man
 
-  # windows-installer:
-  #   name: Windows installer
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 300
-  #     - name: Fetch tags
-  #       run: git fetch --depth=300 origin +refs/tags/*:refs/tags/*
-  #     - uses: actions/setup-python@v1
-  #       with:
-  #         python-version: 3.9
-  #     - name: Install dependencies
-  #       run: |
-  #         ./script/install-dependencies.sh
-  #         python -m pip install wheel pynsist==2.7 distlib==0.3.3
-  #         sudo apt update
-  #         sudo apt install -y nsis imagemagick inkscape
-  #     - name: Installer file name
-  #       id: installer
-  #       run: echo ::set-output name=filename::streamlink-$(python setup.py --version | sed 's/+/_/')
-  #     - name: Build
-  #       run: ./script/makeinstaller.sh "${{ steps.installer.outputs.filename }}"
-  #     - name: Upload artifact
-  #       if: github.repository == 'scowalt/streamlink' && (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || github.event_name == 'schedule')
-  #       uses: actions/upload-artifact@v2-preview
-  #       with:
-  #         name: ${{ steps.installer.outputs.filename }}-win32
-  #         path: ${{ env.STREAMLINK_DIST_DIR }}/${{ steps.installer.outputs.filename }}.exe
+  windows-installer:
+    name: Windows installer
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 300
+      - name: Fetch tags
+        run: git fetch --depth=300 origin +refs/tags/*:refs/tags/*
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          ./script/install-dependencies.sh
+          python -m pip install wheel pynsist==2.7 distlib==0.3.3
+          sudo apt update
+          sudo apt install -y nsis imagemagick inkscape
+      - name: Installer file name
+        id: installer
+        run: echo ::set-output name=filename::streamlink-$(python setup.py --version | sed 's/+/_/')
+      - name: Build
+        run: ./script/makeinstaller.sh "${{ steps.installer.outputs.filename }}"
+      - name: Upload artifact
+        if: github.repository == 'scowalt/streamlink' && (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || github.event_name == 'schedule')
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: ${{ steps.installer.outputs.filename }}-win32
+          path: ${{ env.STREAMLINK_DIST_DIR }}/${{ steps.installer.outputs.filename }}.exe
 
   # deploy-documentation:
   #   name: Deploy docs
@@ -154,6 +154,8 @@ jobs:
     name: New release
     if: github.repository == 'scowalt/streamlink' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-20.04
+    needs:
+      - windows-installer
     outputs:
       exeSha: ${{ steps.generateSha.exeSha }}
     steps:
