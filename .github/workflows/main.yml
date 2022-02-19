@@ -236,7 +236,8 @@ jobs:
         run: |
           choco pack
         shell: pwsh
-      - name: Publish release
+      - name: Push release
+        working-directory: release/chocolatey
         run: |
           $version = "${{ needs.version.outputs.version }}"
           choco push --api-key ${{ secrets.CHOCOLATEY_API_KEY }} streamlink.$version.nupkg
